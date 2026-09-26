@@ -31,8 +31,8 @@ export const MechanismTrace: React.FC<MechanismTraceProps> = ({ timestamp, steps
             <tr>
               <th scope="col" className="mechanism-trace__col-step">#</th>
               <th scope="col" className="mechanism-trace__col-label">Evaluation Phase</th>
-              <th scope="col" className="mechanism-trace__col-local">Local Host (IST)</th>
-              <th scope="col" className="mechanism-trace__col-ci">CI Environment (UTC)</th>
+              <th scope="col" className="mechanism-trace__col-local">Local Host (Passing)</th>
+              <th scope="col" className="mechanism-trace__col-ci">CI Environment (Failing)</th>
               <th scope="col" className="mechanism-trace__col-note">Causal Note</th>
             </tr>
           </thead>
@@ -42,9 +42,9 @@ export const MechanismTrace: React.FC<MechanismTraceProps> = ({ timestamp, steps
                 <td className="mechanism-trace__cell-step">
                   <span className="mechanism-trace__step-circle">{step.stepNumber}</span>
                 </td>
-                <td className="mechanism-trace__cell-label">
+                <th scope="row" className="mechanism-trace__cell-label">
                   <strong>{step.label}</strong>
-                </td>
+                </th>
                 <td className="mechanism-trace__cell-local">
                   <code>{step.localState}</code>
                 </td>

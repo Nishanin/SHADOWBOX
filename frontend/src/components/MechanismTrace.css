@@ -71,7 +71,7 @@
   text-align: left;
 }
 
-.mechanism-trace__table th {
+.mechanism-trace__table thead th {
   padding: 12px 16px;
   background: var(--color-subtle);
   border-bottom: 1px solid var(--color-border);
@@ -83,13 +83,16 @@
   font-weight: 700;
 }
 
-.mechanism-trace__table td {
+.mechanism-trace__table td,
+.mechanism-trace__table tbody th {
   padding: 14px 16px;
   border-bottom: 1px solid var(--color-border);
   vertical-align: top;
+  text-align: left;
 }
 
-.mechanism-trace__row:last-child td {
+.mechanism-trace__row:last-child td,
+.mechanism-trace__row:last-child th {
   border-bottom: none;
 }
 

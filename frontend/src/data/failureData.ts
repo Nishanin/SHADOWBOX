@@ -12,7 +12,7 @@ export const FAILURE_DATA: FailureScenarioData = {
     'A test passes locally but fails in CI. Investigate the environment difference and reproduce the failure.',
   status: 'FAILED',
   testName: 'invoice date validation',
-  testFile: 'src/invoiceChecker.test.js',
+  testFile: 'demo-app/src/invoiceChecker.test.js',
   suiteName: 'Invoice Calendar Date Suite',
   metrics: {
     total: 5,
@@ -46,7 +46,7 @@ export const FAILURE_DATA: FailureScenarioData = {
     environment: 'TZ=UTC',
   },
   rawLogOutput: [
-    'FAIL  src/invoiceChecker.test.js',
+    'FAIL  demo-app/src/invoiceChecker.test.js',
     '',
     '✕ should preserve the invoice calendar date',
     '  Expected: "2024-01-14"',

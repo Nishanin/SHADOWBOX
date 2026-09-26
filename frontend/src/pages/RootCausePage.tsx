@@ -40,8 +40,8 @@ export const RootCausePage: React.FC = () => {
       {/* 2. PRIMARY DIAGNOSED DEFECT */}
       <RootCauseDiagnosis
         status={data.status}
-        confidenceScore={data.confidenceScore}
         confidenceRating={data.confidenceRating}
+        confidenceNote={data.confidenceNote}
         title={data.primaryDiagnosis.title}
         description={data.primaryDiagnosis.description}
         category={data.primaryDiagnosis.category}

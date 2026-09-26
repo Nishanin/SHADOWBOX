@@ -29,8 +29,8 @@ export interface RootCauseData {
   pageSubtitle: string;
   status: string;
   failureTarget: string;
-  confidenceScore: number;
   confidenceRating: ConfidenceLevel;
+  confidenceNote: string;
   primaryDiagnosis: {
     title: string;
     description: string;

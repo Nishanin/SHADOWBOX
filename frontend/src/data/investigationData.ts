@@ -75,9 +75,9 @@ export const INVESTIGATION_DATA: InvestigationPageData = {
       evidence: [
         {
           type: 'source-code',
-          source: 'src/invoiceChecker.js',
+          source: 'demo-app/src/invoiceChecker.js',
           description: 'Target implementation file containing the invoice date parser.',
-          technicalValues: ['invoiceChecker.js'],
+          technicalValues: ['demo-app/src/invoiceChecker.js'],
         },
         {
           type: 'ast-inspection',
@@ -126,7 +126,7 @@ export const INVESTIGATION_DATA: InvestigationPageData = {
           type: 'command-execution',
           source: 'Reproduction Pipeline Log',
           description: 'Test command execution invocation in the reproduction environment.',
-          technicalValues: ['npm test -- src/invoiceChecker.test.js'],
+          technicalValues: ['npm test -- demo-app/src/invoiceChecker.test.js'],
         },
       ],
       missingEvidence: [

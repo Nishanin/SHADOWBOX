@@ -1,0 +1,93 @@
+.verification-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 1. PAGE HEADER */
+.verification-page__header {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.verification-page__header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.verification-page__title-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.verification-page__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.verification-page__target-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 4px 10px;
+}
+
+.verification-page__target-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.verification-page__target-name {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.verification-page__subtitle {
+  font-size: 14px;
+  color: var(--color-muted);
+  max-width: 800px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* 4 & 5. TESTS GRID */
+.verification-page__tests-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
+/* 8 & 9. EVIDENCE & BOUNDARY GRID */
+.verification-page__evidence-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+/* RESPONSIVE LAYOUT */
+@media (max-width: 900px) {
+  .verification-page__tests-grid,
+  .verification-page__evidence-grid {
+    grid-template-columns: 1fr;
+  }
+}

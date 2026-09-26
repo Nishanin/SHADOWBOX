@@ -1,4 +1,4 @@
-export type StatusType = 'fail' | 'pass' | 'unconfirmed' | 'failed';
+export type StatusType = 'FAILED' | 'FAIL' | 'PASS' | 'UNCONFIRMED';
 
 export interface EnvironmentRun {
   id: string;

@@ -21,7 +21,7 @@ export const WORKFLOW_STEPS: WorkflowStepMeta[] = [
     id: 'root-cause',
     label: 'Root Cause',
     path: '/root-cause',
-    description: 'Synthesised root cause with evidence matrix',
+    description: 'Synthesized root cause with evidence matrix',
   },
   {
     id: 'shadowbox',

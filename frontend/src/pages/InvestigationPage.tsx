@@ -63,7 +63,7 @@ export const InvestigationPage: React.FC = () => {
           <span className="investigation-page__action-title">Evidence Collected</span>
           <span className="investigation-page__action-desc">
             All three parallel tracks have completed analysis. Proceed to synthesize and isolate the
-            definitive root cause.
+            root cause candidate.
           </span>
         </div>
 

@@ -70,6 +70,12 @@
   background: #16a34a;
 }
 
+.root-cause-diagnosis__confidence-sub {
+  font-family: var(--font-sans);
+  color: #15803d;
+  font-weight: 500;
+}
+
 .root-cause-diagnosis__body {
   padding: 20px 24px;
   display: flex;

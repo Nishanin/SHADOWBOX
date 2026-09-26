@@ -23,10 +23,10 @@ interface StatusBadgeProps {
 function resolveVariant(status: string, explicitVariant?: StatusBadgeVariant): StatusBadgeVariant {
   if (explicitVariant) return explicitVariant;
   const upper = status.trim().toUpperCase();
-  if (upper === 'FAIL' || upper === 'FAILED') return 'fail';
-  if (upper === 'PASS' || upper === 'PASSED') return 'pass';
+  if (upper === 'FAIL' || upper === 'FAILED' || upper === 'FAILURE REPRODUCED') return 'fail';
+  if (upper === 'PASS' || upper === 'PASSED' || upper === 'MATCHED' || upper === 'VERIFIED') return 'pass';
   if (upper === 'COMPLETE') return 'complete';
-  if (upper === 'INVESTIGATING') return 'investigating';
+  if (upper === 'INVESTIGATING' || upper === 'REPRODUCTION') return 'investigating';
   if (upper === 'HIGH') return 'high';
   if (upper === 'MEDIUM') return 'medium';
   if (upper === 'UNCONFIRMED' || upper === 'PRELIMINARY') return 'unconfirmed';
@@ -45,7 +45,6 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   return (
     <span
       className={`status-badge status-badge--${activeVariant} status-badge--${size} ${className}`}
-      role="status"
     >
       {showDot && <span className="status-badge__dot" aria-hidden="true" />}
       <span className="status-badge__text">{status}</span>

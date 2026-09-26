@@ -5,8 +5,8 @@ import './RootCauseDiagnosis.css';
 
 interface RootCauseDiagnosisProps {
   status: string;
-  confidenceScore: number;
   confidenceRating: ConfidenceLevel;
+  confidenceNote?: string;
   title: string;
   description: string;
   category: string;
@@ -16,8 +16,8 @@ interface RootCauseDiagnosisProps {
 
 export const RootCauseDiagnosis: React.FC<RootCauseDiagnosisProps> = ({
   status,
-  confidenceScore,
   confidenceRating,
+  confidenceNote,
   title,
   description,
   category,
@@ -38,9 +38,14 @@ export const RootCauseDiagnosis: React.FC<RootCauseDiagnosisProps> = ({
           <StatusBadge status={status} variant="pass" size="md" />
           <div className="root-cause-diagnosis__confidence-pill" title="Synthesized confidence rating">
             <span className="root-cause-diagnosis__confidence-dot" aria-hidden="true" />
-            <span>
-              <strong>{confidenceScore}%</strong> Confidence ({confidenceRating})
+            <span className="root-cause-diagnosis__confidence-label">
+              <strong>{confidenceRating} CONFIDENCE</strong>
             </span>
+            {confidenceNote && (
+              <span className="root-cause-diagnosis__confidence-sub">
+                · {confidenceNote}
+              </span>
+            )}
           </div>
         </div>
       </div>
