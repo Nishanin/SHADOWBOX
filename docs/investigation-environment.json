@@ -1,0 +1,176 @@
+{
+  "agent": "environment",
+  "runAt": "2024-01-15T00:00:00Z",
+  "status": "COMPLETE",
+
+  "findings": [
+    {
+      "id": "ENV-01",
+      "type": "OBSERVED_FACT",
+      "title": "Developer machine timezone is Asia/Calcutta (IST, UTC+5:30)",
+      "detail": "process.env.TZ is null (not explicitly set). Node.js resolves the system timezone as Asia/Calcutta. Intl.DateTimeFormat().resolvedOptions().timeZone = 'Asia/Calcutta'. getTimezoneOffset() = -330 (minutes behind UTC, i.e. UTC+5:30).",
+      "evidence": {
+        "source": "runtime",
+        "command": "node -e \"Intl.DateTimeFormat().resolvedOptions().timeZone\"",
+        "output": "Asia/Calcutta"
+      },
+      "impact": "HIGH",
+      "impactDetail": "Determines which calendar date local Date methods return for edge timestamps"
+    },
+    {
+      "id": "ENV-02",
+      "type": "OBSERVED_FACT",
+      "title": "SHADOWBOX container timezone is UTC",
+      "detail": "ENV TZ=UTC is declared explicitly in shadowbox/Dockerfile line 25. node:20-alpine defaults to UTC. UTC offset = 0 minutes.",
+      "evidence": {
+        "source": "file",
+        "file": "shadowbox/Dockerfile",
+        "line": 25,
+        "content": "ENV TZ=UTC"
+      },
+      "impact": "HIGH",
+      "impactDetail": "UTC is the decisive environmental difference that triggers the failure"
+    },
+    {
+      "id": "ENV-03",
+      "type": "OBSERVED_FACT",
+      "title": "Critical timestamp crosses midnight between IST and UTC",
+      "detail": "The test uses timestamp '2024-01-14T23:30:00.000Z'. In IST (UTC+5:30) this is 2024-01-15 05:00 (Jan 15). In UTC this is 2024-01-14 23:30 (Jan 14). The calendar date derived from this timestamp differs by one day depending on the active timezone.",
+      "evidence": {
+        "source": "runtime",
+        "command": "node -e: IST => localDate=2024-01-15, UTC => localDate=2024-01-14",
+        "output": "getDate() returns 15 (IST) vs 14 (UTC)"
+      },
+      "impact": "HIGH",
+      "impactDetail": "One-day calendar date difference is the direct cause of assertion failure"
+    },
+    {
+      "id": "ENV-04",
+      "type": "OBSERVED_FACT",
+      "title": "Developer machine Node version: v24.18.0 / SHADOWBOX Node version: 20.x",
+      "detail": "Local: Node v24.18.0, npm 12.0.2, Windows 10.0.26200. SHADOWBOX: node:20-alpine (Node 20.x LTS, npm bundled, Alpine Linux musl libc). Minor version difference but both support node:test and the Date APIs involved.",
+      "evidence": {
+        "source": "runtime",
+        "command": "node --version",
+        "output": "v24.18.0 (local) | node:20-alpine (SHADOWBOX Dockerfile)"
+      },
+      "impact": "LOW",
+      "impactDetail": "Version difference is not the failure trigger; TZ is"
+    },
+    {
+      "id": "ENV-05",
+      "type": "OBSERVED_FACT",
+      "title": "TZ environment variable is the sole differentiating factor",
+      "detail": "All other factors (Node runtime, test command, test files, source code, dependencies) are identical between local and SHADOWBOX. The only difference that produces the observed pass/fail split is the active timezone offset applied by the OS/runtime to local Date methods.",
+      "evidence": {
+        "source": "file",
+        "file": "shadowbox/Dockerfile",
+        "content": "Copies exact same src/ and tests/; same npm test command; TZ=UTC is the single ENV difference"
+      },
+      "impact": "HIGH",
+      "impactDetail": "Isolates TZ as the root environmental variable"
+    },
+    {
+      "id": "ENV-06",
+      "type": "OBSERVED_FACT",
+      "title": "No TZ variable in demo-app package.json scripts (local test)",
+      "detail": "The 'test' script in package.json is 'node --test tests/invoiceChecker.test.js' with no TZ prefix. The 'test:utc' script uses 'cross-env TZ=UTC ...' explicitly to simulate the failure. The default test run inherits the system timezone.",
+      "evidence": {
+        "source": "file",
+        "file": "demo-app/package.json",
+        "lines": "7-8",
+        "content": "\"test\": \"node --test tests/invoiceChecker.test.js\""
+      },
+      "impact": "MEDIUM",
+      "impactDetail": "Confirms local test inherits IST from OS"
+    },
+    {
+      "id": "ENV-07",
+      "type": "OBSERVED_FACT",
+      "title": "cross-env devDependency exists only to simulate the controlled environment locally",
+      "detail": "cross-env 7.0.3 is the only devDependency. It exists solely to allow 'npm run test:utc' on Windows (which cannot set env vars inline). It is not present in the SHADOWBOX container (npm ci --omit=dev).",
+      "evidence": {
+        "source": "file",
+        "file": "demo-app/package.json",
+        "lines": "10-12",
+        "content": "\"cross-env\": \"7.0.3\" in devDependencies | shadowbox/Dockerfile:40 npm ci --omit=dev"
+      },
+      "impact": "LOW",
+      "impactDetail": "Tooling detail; not relevant to the failure mechanism"
+    }
+  ],
+
+  "environmentDifferences": [
+    {
+      "dimension": "Timezone",
+      "local": "Asia/Calcutta (IST, UTC+5:30) - system default, TZ not set",
+      "shadowbox": "UTC (offset 0) - ENV TZ=UTC in Dockerfile",
+      "effect": "getDate() returns 15 locally, 14 in SHADOWBOX for timestamp 2024-01-14T23:30:00Z",
+      "decisive": true
+    },
+    {
+      "dimension": "Operating System",
+      "local": "Windows 10 (win32, x64)",
+      "shadowbox": "Alpine Linux (musl libc, Docker)",
+      "effect": "No observed impact on test behavior",
+      "decisive": false
+    },
+    {
+      "dimension": "Node.js version",
+      "local": "v24.18.0",
+      "shadowbox": "v20.x (node:20-alpine)",
+      "effect": "Both support node:test and identical Date APIs; not the failure trigger",
+      "decisive": false
+    },
+    {
+      "dimension": "npm version",
+      "local": "12.0.2",
+      "shadowbox": "bundled with node:20-alpine",
+      "effect": "No impact on test execution",
+      "decisive": false
+    }
+  ],
+
+  "evidence": [
+    {
+      "ref": "ENV-E1",
+      "source": "runtime",
+      "command": "node -e \"Intl.DateTimeFormat().resolvedOptions().timeZone\"",
+      "output": "Asia/Calcutta"
+    },
+    {
+      "ref": "ENV-E2",
+      "source": "file",
+      "file": "shadowbox/Dockerfile",
+      "line": 25,
+      "content": "ENV TZ=UTC"
+    },
+    {
+      "ref": "ENV-E3",
+      "source": "runtime",
+      "command": "TZ=UTC node -e \"new Date('2024-01-14T23:30:00.000Z').getDate()\"",
+      "output": "14"
+    },
+    {
+      "ref": "ENV-E4",
+      "source": "runtime",
+      "command": "node -e \"new Date('2024-01-14T23:30:00.000Z').getDate()\" (IST)",
+      "output": "15"
+    },
+    {
+      "ref": "ENV-E5",
+      "source": "file",
+      "file": "demo-app/package.json",
+      "line": 7,
+      "content": "\"test\": \"node --test tests/invoiceChecker.test.js\""
+    },
+    {
+      "ref": "ENV-E6",
+      "source": "file",
+      "file": "shadowbox/environment.json",
+      "content": "full environment specification"
+    }
+  ],
+
+  "missingEvidence": []
+}

@@ -1,0 +1,171 @@
+{
+  "agent": "code",
+  "runAt": "2024-01-15T00:00:00Z",
+  "status": "COMPLETE",
+
+  "findings": [
+    {
+      "id": "CODE-01",
+      "type": "OBSERVED_FACT",
+      "title": "isDueToday() uses three local-timezone Date methods to derive a calendar date",
+      "detail": "Function isDueToday() at invoiceChecker.js:29-39 constructs a YYYY-MM-DD string from a Date object using d.getFullYear(), d.getMonth(), and d.getDate(). All three methods return values in the *local system timezone*, not UTC. The constructed string is then compared with the targetDate parameter.",
+      "evidence": {
+        "file": "demo-app/src/invoiceChecker.js",
+        "lines": "33-37",
+        "code": [
+          "const year  = d.getFullYear();",
+          "const month = String(d.getMonth() + 1).padStart(2, '0');",
+          "const day   = String(d.getDate()).padStart(2, '0');",
+          "const localDateStr = `${year}-${month}-${day}`;",
+          "return localDateStr === targetDate;"
+        ]
+      },
+      "impact": "HIGH",
+      "impactDetail": "Root cause: local-TZ extraction applied to UTC input"
+    },
+    {
+      "id": "CODE-02",
+      "type": "OBSERVED_FACT",
+      "title": "Input is a UTC ISO 8601 string; output assumption is implicitly local-calendar",
+      "detail": "The @param JSDoc declares isoTimestamp as 'ISO 8601 UTC string' (invoiceChecker.js:25). The parameter contract acknowledges the input is UTC. However, the implementation extracts the date using local-timezone methods rather than UTC methods. There is a mismatch between the declared contract (UTC input) and the implementation (local output).",
+      "evidence": {
+        "file": "demo-app/src/invoiceChecker.js",
+        "lines": "24-26",
+        "code": "@param {string} isoTimestamp - ISO 8601 UTC string, e.g. \"2024-01-14T23:30:00.000Z\""
+      },
+      "impact": "HIGH",
+      "impactDetail": "UTC input contract violated by local-TZ implementation"
+    },
+    {
+      "id": "CODE-03",
+      "type": "OBSERVED_FACT",
+      "title": "The fix is documented in the source but deliberately not applied",
+      "detail": "The source code comment at invoiceChecker.js:16-18 explicitly documents the correct fix: 'use getUTCFullYear(), getUTCMonth(), getUTCDate()'. This confirms the bug is intentional for the SHADOWBOX demonstration. No UTC methods are present in the actual implementation body.",
+      "evidence": {
+        "file": "demo-app/src/invoiceChecker.js",
+        "lines": "16-18",
+        "code": "The correct fix (NOT applied here) would be to use getUTCFullYear(), getUTCMonth(), getUTCDate()"
+      },
+      "impact": "INFORMATIONAL",
+      "impactDetail": "Confirms intentional demo bug; fix path is documented"
+    },
+    {
+      "id": "CODE-04",
+      "type": "OBSERVED_FACT",
+      "title": "getInvoicesDueOn() inherits the same sensitivity via isDueToday()",
+      "detail": "getInvoicesDueOn() at invoiceChecker.js:48-50 delegates entirely to isDueToday() per invoice. It has no independent date logic. Any failure in isDueToday() propagates to the filter result and downstream amount calculations.",
+      "evidence": {
+        "file": "demo-app/src/invoiceChecker.js",
+        "lines": "48-50",
+        "code": "return invoices.filter(inv => isDueToday(inv.dueAt, targetDate));"
+      },
+      "impact": "MEDIUM",
+      "impactDetail": "Downstream amplification of isDueToday() failure"
+    },
+    {
+      "id": "CODE-05",
+      "type": "OBSERVED_FACT",
+      "title": "3 of 5 tests are TZ-sensitive; 2 of 5 are TZ-independent",
+      "detail": "Classification of all 5 tests: TZ-SENSITIVE (fail in UTC, pass in IST): (1) 'returns true for an invoice whose UTC time crosses midnight into the target date in local TZ' - uses 2024-01-14T23:30:00Z which is Jan 15 IST but Jan 14 UTC; (2) 'returns both invoices due on 2024-01-15' - includes INV-001 which uses the same edge timestamp; (3) 'returns correct total amount for due invoices' - total depends on INV-001 inclusion (500 missing in UTC => 750 not 1250). TZ-INDEPENDENT (pass in both environments): (4) 'returns false for an invoice due on a completely different date' - uses 2024-01-01T12:00Z against Jan 15, universally false; (5) 'returns true for a clearly same-day invoice' - uses 2024-01-15T12:00Z (noon UTC), universally Jan 15 in all timezones UTC-11 to UTC+14.",
+      "evidence": {
+        "file": "demo-app/tests/invoiceChecker.test.js",
+        "lines": "33-34",
+        "code": "EDGE_TIMESTAMP = '2024-01-14T23:30:00.000Z' | TARGET_DATE = '2024-01-15'"
+      },
+      "impact": "HIGH",
+      "impactDetail": "Explains exact 2-pass/3-fail split observed in reproduction"
+    },
+    {
+      "id": "CODE-06",
+      "type": "OBSERVED_FACT",
+      "title": "Test failure messages embed diagnostic runtime information",
+      "detail": "The three failing tests include runtime diagnostics in their assertion messages: 'Current TZ: UTC', 'Resolved local date: 2024-01-14', 'INV-001 local date: 2024-01-14'. These messages are emitted by code inside the test assertion itself, not by the application. They confirm the exact mechanism at runtime.",
+      "evidence": {
+        "file": "demo-app/tests/invoiceChecker.test.js",
+        "lines": "46-54",
+        "code": "Current TZ: ${process.env.TZ || '(not set)'} | Resolved local date: ${d.getFullYear()}-..."
+      },
+      "impact": "INFORMATIONAL",
+      "impactDetail": "Provides runtime confirmation of TZ mechanism in test output"
+    },
+    {
+      "id": "CODE-07",
+      "type": "INFERRED_RELATIONSHIP",
+      "title": "The bug only triggers for timestamps within UTC+5:30 hours of midnight",
+      "detail": "The local-vs-UTC calendar date can only differ when the UTC timestamp falls in the 23:00-23:59 range for a timezone ahead of UTC, or in 00:00-05:29 for IST specifically. Timestamps at noon UTC (12:00Z) are safe in any timezone that is less than 12 hours from UTC. The test intentionally chooses 23:30 UTC to be squarely in the danger zone for IST (resulting in 05:00 IST the next day).",
+      "evidence": {
+        "source": "analysis",
+        "ref": "CODE-05",
+        "content": "IST utcOffset = +330 minutes (5h30m); edge window = 18:30-23:59 UTC"
+      },
+      "impact": "MEDIUM",
+      "impactDetail": "Defines the blast radius of the bug"
+    }
+  ],
+
+  "affectedFiles": [
+    {
+      "file": "demo-app/src/invoiceChecker.js",
+      "role": "SOURCE OF BUG",
+      "affectedLines": "33-35",
+      "affectedAPIs": ["Date.prototype.getFullYear", "Date.prototype.getMonth", "Date.prototype.getDate"]
+    },
+    {
+      "file": "demo-app/tests/invoiceChecker.test.js",
+      "role": "EXPOSES BUG",
+      "tzSensitiveTests": 3,
+      "tzIndependentTests": 2
+    }
+  ],
+
+  "affectedFunctions": [
+    {
+      "name": "isDueToday",
+      "file": "demo-app/src/invoiceChecker.js",
+      "lines": "29-39",
+      "rootOfFailure": true,
+      "buggyAPIs": [
+        { "api": "d.getFullYear()", "line": 33, "shouldBe": "d.getUTCFullYear()" },
+        { "api": "d.getMonth()",    "line": 34, "shouldBe": "d.getUTCMonth()" },
+        { "api": "d.getDate()",     "line": 35, "shouldBe": "d.getUTCDate()" }
+      ]
+    },
+    {
+      "name": "getInvoicesDueOn",
+      "file": "demo-app/src/invoiceChecker.js",
+      "lines": "48-50",
+      "rootOfFailure": false,
+      "note": "Inherits failure from isDueToday() via filter callback"
+    }
+  ],
+
+  "evidence": [
+    {
+      "ref": "CODE-E1",
+      "source": "file",
+      "file": "demo-app/src/invoiceChecker.js",
+      "lines": "33-35",
+      "content": "d.getFullYear() / d.getMonth() / d.getDate() - all local-timezone"
+    },
+    {
+      "ref": "CODE-E2",
+      "source": "static_analysis",
+      "method": "pattern scan for TZ-sensitive Date APIs",
+      "result": "3 live usages of local-timezone methods (lines 33, 34, 35); 0 usages of UTC equivalents in implementation body"
+    },
+    {
+      "ref": "CODE-E3",
+      "source": "file",
+      "file": "demo-app/tests/invoiceChecker.test.js",
+      "lines": "33-34",
+      "content": "EDGE_TIMESTAMP = '2024-01-14T23:30:00.000Z' chosen to cross midnight in IST"
+    },
+    {
+      "ref": "CODE-E4",
+      "source": "runtime_verification",
+      "result": "IST: new Date('2024-01-14T23:30:00.000Z').getDate() === 15; UTC: same call === 14"
+    }
+  ],
+
+  "missingEvidence": []
+}
