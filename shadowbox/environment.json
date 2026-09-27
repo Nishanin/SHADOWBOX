@@ -1,0 +1,57 @@
+{
+  "shadowbox": {
+    "purpose": "Reproduce the deterministic timezone-dependent test failure from demo-app/",
+    "phase": 2,
+    "project": "SHADOWBOX"
+  },
+  "runtime": {
+    "engine": "Node.js",
+    "version": "20.x (node:20-alpine)",
+    "packageManager": "npm",
+    "packageManagerVersion": "bundled with node:20-alpine"
+  },
+  "environment": {
+    "TZ": "UTC",
+    "utcOffsetMinutes": 0,
+    "baseImage": "node:20-alpine",
+    "os": "Alpine Linux (musl libc)"
+  },
+  "application": {
+    "source": "demo-app/",
+    "entrypoint": "src/invoiceChecker.js",
+    "testCommand": "node --test tests/invoiceChecker.test.js",
+    "dependencies": {
+      "cross-env": "7.0.3"
+    }
+  },
+  "bug": {
+    "location": "demo-app/src/invoiceChecker.js",
+    "function": "isDueToday",
+    "description": "Uses local-timezone Date methods (getDate, getMonth, getFullYear) instead of UTC equivalents to extract a calendar date from a UTC ISO timestamp.",
+    "trigger": "TZ environment variable is not set to the developer's local timezone (Asia/Calcutta / IST / UTC+5:30)",
+    "criticalTimestamp": "2024-01-14T23:30:00.000Z",
+    "targetDate": "2024-01-15"
+  },
+  "expectedResults": {
+    "totalTests": 5,
+    "passed": 2,
+    "failed": 3,
+    "failingTests": [
+      "isDueToday() > returns true for an invoice whose UTC time crosses midnight into the target date in local TZ",
+      "getInvoicesDueOn() > returns both invoices due on 2024-01-15 (local TZ)",
+      "getInvoicesDueOn() > returns correct total amount for due invoices"
+    ],
+    "testExitCode": 1,
+    "reproductionStatus": "FAILURE REPRODUCED"
+  },
+  "localEnvironment": {
+    "TZ": "Asia/Calcutta",
+    "utcOffsetMinutes": -330,
+    "expectedResults": {
+      "totalTests": 5,
+      "passed": 5,
+      "failed": 0,
+      "testExitCode": 0
+    }
+  }
+}
