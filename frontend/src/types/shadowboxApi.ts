@@ -11,14 +11,23 @@ export type ShadowboxStatus =
   | 'INFRASTRUCTURE_ERROR';
 
 export interface ShadowboxRunResult {
-  variant: ShadowboxVariant;
+  variant: ShadowboxVariant | 'user-reproduction' | string;
+  sessionId?: string | null;
+  repositoryUrl?: string | null;
   sourceCommit: string | null;
-  imageTag: string | null;
+  imageTag?: string | null;
   totalTests: number | null;
   passedTests: number | null;
   failedTests: number | null;
   testExitCode: number | null;
-  status: ShadowboxStatus | string;
+  status:
+    | ShadowboxStatus
+    | 'NO_FAILURE'
+    | 'UNSUPPORTED_PROJECT'
+    | 'UNSUPPORTED_TEST_COMMAND'
+    | 'DEPENDENCY_UNAVAILABLE'
+    | 'TIMEOUT'
+    | string;
   stdout: string;
   stderr: string;
   duration: string;
@@ -61,3 +70,5 @@ export class ShadowboxApiError extends Error {
     this.apiResponse = apiResponse;
   }
 }
+
+export type { UserIntakePayload, InvestigationSession, RepositoryMetadata, UserEnvironmentInfo } from './workflow';

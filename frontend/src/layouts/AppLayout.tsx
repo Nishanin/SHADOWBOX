@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { WORKFLOW_STEPS } from '../data/workflowSteps';
 import type { ShadowboxRunResult } from '../types/shadowboxApi';
-import type { WorkflowOutletContext } from '../types/workflow';
+import type { InvestigationSession, WorkflowOutletContext } from '../types/workflow';
 import './AppLayout.css';
 
 /**
@@ -15,6 +15,7 @@ import './AppLayout.css';
  */
 export function AppLayout() {
   const location = useLocation();
+  const [session, setSession] = useState<InvestigationSession | null>(null);
   const [reproductionResult, setReproductionResult] = useState<ShadowboxRunResult | null>(null);
   const [verificationResult, setVerificationResult] = useState<ShadowboxRunResult | null>(null);
 
@@ -23,6 +24,8 @@ export function AppLayout() {
   );
 
   const outletContext: WorkflowOutletContext = {
+    session,
+    setSession,
     reproductionResult,
     setReproductionResult,
     verificationResult,

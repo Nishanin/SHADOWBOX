@@ -2,12 +2,16 @@ export type AgentType = 'environment' | 'code' | 'ci';
 
 export type InvestigationStatus = 'COMPLETE' | 'INVESTIGATING' | 'PENDING';
 
-export type ImpactLevel = 'HIGH' | 'MEDIUM' | 'LOW';
+export type ImpactLevel = 'HIGH' | 'MEDIUM' | 'LOW' | 'INFORMATIONAL';
+export type FindingType = 'OBSERVED_FACT' | 'INFERRED_RELATIONSHIP' | 'MISSING_EVIDENCE';
 
 export interface Finding {
+  type?: FindingType;
   title: string;
   description: string;
   impact: ImpactLevel;
+  location?: string;
+  evidence?: string;
 }
 
 export interface EvidenceItem {
