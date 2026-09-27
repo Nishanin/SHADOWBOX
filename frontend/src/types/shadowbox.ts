@@ -20,6 +20,8 @@ export interface ReproductionResult {
   passedCount: number;
   failedCount: number;
   exitCode: number;
+  duration?: string;
+  imageTag?: string | null;
 }
 
 export interface FailureMatchSide {

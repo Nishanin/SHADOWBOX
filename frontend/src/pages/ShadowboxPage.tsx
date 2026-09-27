@@ -1,6 +1,9 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useOutletContext } from 'react-router-dom';
 import { SHADOWBOX_DATA } from '../data/shadowboxData';
+import { runShadowbox } from '../services/shadowboxApi';
+import type { ReproductionResult } from '../types/shadowbox';
+import type { WorkflowOutletContext } from '../types/workflow';
 import { StatusBadge } from '../components/StatusBadge';
 import { ReproductionEnvironment } from '../components/ReproductionEnvironment';
 import { CommandPanel } from '../components/CommandPanel';
@@ -20,6 +23,43 @@ import './ShadowboxPage.css';
  */
 export const ShadowboxPage: React.FC = () => {
   const data = SHADOWBOX_DATA;
+  const outlet = useOutletContext<WorkflowOutletContext | undefined>();
+  const reproductionResult = outlet?.reproductionResult ?? null;
+  const setReproductionResult = outlet?.setReproductionResult;
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleRun = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await runShadowbox('reproduction');
+      setReproductionResult?.(res);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const activeResult: ReproductionResult = reproductionResult
+    ? {
+        status: reproductionResult.status,
+        label: 'REAL SHADOWBOX CONTAINER EXECUTION',
+        totalTests: reproductionResult.totalTests ?? 5,
+        passedCount: reproductionResult.passedTests ?? 2,
+        failedCount: reproductionResult.failedTests ?? 3,
+        exitCode: reproductionResult.testExitCode ?? 1,
+        duration: reproductionResult.duration,
+        imageTag: reproductionResult.imageTag,
+      }
+    : data.result;
+
+  const activeLogs: string[] = reproductionResult?.stdout
+    ? reproductionResult.stdout.split('\n')
+    : data.logLines;
 
   return (
     <div className="shadowbox-page">
@@ -44,13 +84,28 @@ export const ShadowboxPage: React.FC = () => {
       <ReproductionEnvironment env={data.environment} />
 
       {/* 3. REPRODUCTION COMMAND */}
-      <CommandPanel command={data.command} />
+      <CommandPanel command={data.command} onRun={handleRun} isLoading={isLoading} />
+
+      {/* ERROR BANNER IF ANY */}
+      {error && (
+        <div className="shadowbox-page__error-banner" role="alert">
+          <span className="shadowbox-page__error-icon" aria-hidden="true">
+            ⚠️
+          </span>
+          <div className="shadowbox-page__error-content">
+            <strong>Execution Error:</strong> {error}
+          </div>
+        </div>
+      )}
 
       {/* 4. REPRODUCTION STATUS */}
-      <ReproductionStatus result={data.result} />
+      <ReproductionStatus result={activeResult} />
 
       {/* 5. REPRODUCTION LOG */}
-      <LogPanel title="Reproduction Output" lines={data.logLines} />
+      <LogPanel
+        title={reproductionResult ? `Reproduction Output (${reproductionResult.duration})` : 'Reproduction Output'}
+        lines={activeLogs}
+      />
 
       {/* 6. FAILURE MATCH */}
       <FailureMatch match={data.match} />

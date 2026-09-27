@@ -4,9 +4,15 @@ import './CommandPanel.css';
 
 interface CommandPanelProps {
   command: ReproductionCommandSpec;
+  onRun?: () => void;
+  isLoading?: boolean;
 }
 
-export const CommandPanel: React.FC<CommandPanelProps> = ({ command }) => {
+export const CommandPanel: React.FC<CommandPanelProps> = ({
+  command,
+  onRun,
+  isLoading = false,
+}) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -30,14 +36,39 @@ export const CommandPanel: React.FC<CommandPanelProps> = ({ command }) => {
           </h2>
         </div>
 
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="command-panel__copy-btn"
-          aria-label="Copy full command invocation to clipboard"
-        >
-          {copied ? 'Copied' : 'Copy Command'}
-        </button>
+        <div className="command-panel__header-actions">
+          {onRun && (
+            <button
+              type="button"
+              onClick={onRun}
+              disabled={isLoading}
+              className="command-panel__run-btn"
+              id="run-reproduction-btn"
+              aria-label="Execute reproduction in Shadowbox"
+            >
+              {isLoading ? (
+                <>
+                  <span className="command-panel__spinner" aria-hidden="true" />
+                  <span>Running in Shadowbox...</span>
+                </>
+              ) : (
+                <>
+                  <span aria-hidden="true">▶</span>
+                  <span>Run in Shadowbox</span>
+                </>
+              )}
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="command-panel__copy-btn"
+            aria-label="Copy full command invocation to clipboard"
+          >
+            {copied ? 'Copied' : 'Copy Command'}
+          </button>
+        </div>
       </div>
 
       <div className="command-panel__body">

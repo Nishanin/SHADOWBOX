@@ -21,3 +21,10 @@ export interface WorkflowStepMeta {
   path: string;
   description: string;
 }
+
+export interface WorkflowOutletContext {
+  reproductionResult: import('./shadowboxApi').ShadowboxRunResult | null;
+  setReproductionResult: (result: import('./shadowboxApi').ShadowboxRunResult | null) => void;
+  verificationResult: import('./shadowboxApi').ShadowboxRunResult | null;
+  setVerificationResult: (result: import('./shadowboxApi').ShadowboxRunResult | null) => void;
+}

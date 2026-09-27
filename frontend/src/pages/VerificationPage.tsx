@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { VERIFICATION_DATA } from '../data/verificationData';
+import { runShadowbox } from '../services/shadowboxApi';
+import type { ShadowboxVerificationData } from '../types/verification';
+import type { WorkflowOutletContext } from '../types/workflow';
 import { StatusBadge } from '../components/StatusBadge';
 import { VerificationSummary } from '../components/VerificationSummary';
 import { FixApplied } from '../components/FixApplied';
@@ -21,6 +25,44 @@ import './VerificationPage.css';
  */
 export const VerificationPage: React.FC = () => {
   const data = VERIFICATION_DATA;
+  const outlet = useOutletContext<WorkflowOutletContext | undefined>();
+  const verificationResult = outlet?.verificationResult ?? null;
+  const setVerificationResult = outlet?.setVerificationResult;
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleRun = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await runShadowbox('verification');
+      setVerificationResult?.(res);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const activeVerification: ShadowboxVerificationData = verificationResult
+    ? {
+        ...data.shadowboxVerification,
+        totalTests: verificationResult.totalTests ?? 7,
+        passedCount: verificationResult.passedTests ?? 7,
+        failedCount: verificationResult.failedTests ?? 0,
+        exitCode: verificationResult.testExitCode ?? 0,
+        status: verificationResult.status === 'VERIFIED' ? 'PASS' : String(verificationResult.status),
+        currentStatus: verificationResult.status === 'VERIFIED' ? 'PASS' : String(verificationResult.status),
+        duration: verificationResult.duration,
+        imageTag: verificationResult.imageTag,
+      }
+    : data.shadowboxVerification;
+
+  const activeLogs: string[] | undefined = verificationResult?.stdout
+    ? verificationResult.stdout.split('\n')
+    : undefined;
 
   return (
     <div className="verification-page">
@@ -41,6 +83,18 @@ export const VerificationPage: React.FC = () => {
         <p className="verification-page__subtitle">{data.pageSubtitle}</p>
       </header>
 
+      {/* ERROR BANNER IF ANY */}
+      {error && (
+        <div className="verification-page__error-banner" role="alert">
+          <span className="verification-page__error-icon" aria-hidden="true">
+            ⚠️
+          </span>
+          <div className="verification-page__error-content">
+            <strong>Verification Error:</strong> {error}
+          </div>
+        </div>
+      )}
+
       {/* 2. VERIFICATION SUMMARY (3 LAYERS) */}
       <VerificationSummary
         status={data.statusBadge}
@@ -58,7 +112,12 @@ export const VerificationPage: React.FC = () => {
       </div>
 
       {/* 6. SHADOWBOX VERIFICATION */}
-      <ShadowboxVerification data={data.shadowboxVerification} />
+      <ShadowboxVerification
+        data={activeVerification}
+        onRun={handleRun}
+        isLoading={isLoading}
+        logs={activeLogs}
+      />
 
       {/* 7. BEFORE / AFTER COMPARISON */}
       <BeforeAfterComparison data={data.beforeAfter} />

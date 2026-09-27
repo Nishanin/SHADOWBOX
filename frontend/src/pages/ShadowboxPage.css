@@ -4,6 +4,28 @@
   gap: 24px;
 }
 
+.shadowbox-page__error-banner {
+  background: #fef2f2;
+  border: 1px solid #f87171;
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  color: #991b1b;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.shadowbox-page__error-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.shadowbox-page__error-content {
+  flex: 1;
+}
+
 /* 1. PAGE HEADER */
 .shadowbox-page__header {
   border-bottom: 1px solid var(--color-border);

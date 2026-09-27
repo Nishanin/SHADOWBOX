@@ -35,6 +35,50 @@
   letter-spacing: 0.01em;
 }
 
+.command-panel__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.command-panel__run-btn {
+  background: #2563eb;
+  color: #ffffff;
+  border: 1px solid #1d4ed8;
+  border-radius: var(--radius);
+  padding: 5px 12px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.command-panel__run-btn:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.command-panel__run-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.command-panel__spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: sb-spin 0.8s linear infinite;
+}
+
+@keyframes sb-spin {
+  to { transform: rotate(360deg); }
+}
+
 .command-panel__copy-btn {
   background: var(--color-surface);
   color: var(--color-secondary);

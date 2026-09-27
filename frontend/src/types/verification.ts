@@ -53,6 +53,8 @@ export interface ShadowboxVerificationData {
   explanation: string;
   earlierStatus: string;
   currentStatus: string;
+  duration?: string;
+  imageTag?: string | null;
 }
 
 export interface BeforeAfterSnapshot {

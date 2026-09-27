@@ -1,5 +1,8 @@
+import { useState } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { WORKFLOW_STEPS } from '../data/workflowSteps';
+import type { ShadowboxRunResult } from '../types/shadowboxApi';
+import type { WorkflowOutletContext } from '../types/workflow';
 import './AppLayout.css';
 
 /**
@@ -12,9 +15,19 @@ import './AppLayout.css';
  */
 export function AppLayout() {
   const location = useLocation();
+  const [reproductionResult, setReproductionResult] = useState<ShadowboxRunResult | null>(null);
+  const [verificationResult, setVerificationResult] = useState<ShadowboxRunResult | null>(null);
+
   const activeStepIndex = WORKFLOW_STEPS.findIndex((step) =>
     step.path === '/' ? location.pathname === '/' : location.pathname.startsWith(step.path),
   );
+
+  const outletContext: WorkflowOutletContext = {
+    reproductionResult,
+    setReproductionResult,
+    verificationResult,
+    setVerificationResult,
+  };
 
   return (
     <div className="app-layout">
@@ -68,7 +81,7 @@ export function AppLayout() {
       </nav>
 
       <main className="app-main">
-        <Outlet />
+        <Outlet context={outletContext} />
       </main>
     </div>
   );

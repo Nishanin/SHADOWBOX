@@ -38,6 +38,13 @@ export const ReproductionStatus: React.FC<ReproductionStatusProps> = ({ result }
           <span className="repro-status__metric-label">Process Exit Code</span>
           <code className="repro-status__exit-code">{result.exitCode}</code>
         </div>
+
+        {result.duration && (
+          <div className="repro-status__metric-item repro-status__metric-item--duration">
+            <span className="repro-status__metric-label">Duration</span>
+            <span className="repro-status__metric-val">{result.duration}</span>
+          </div>
+        )}
       </div>
     </section>
   );
