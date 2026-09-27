@@ -1,0 +1,153 @@
+.log-panel {
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.log-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: #0b0f17;
+  border-bottom: 1px solid #1f2937;
+}
+
+.log-panel__header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.log-panel__dots {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.log-panel__dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.log-panel__dot--red {
+  background: #ef4444;
+}
+
+.log-panel__dot--yellow {
+  background: #f59e0b;
+}
+
+.log-panel__dot--green {
+  background: #10b981;
+}
+
+.log-panel__title {
+  color: #f3f4f6;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.log-panel__runner-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #9ca3af;
+  background: #1f2937;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #374151;
+}
+
+.log-panel__copy-btn {
+  background: #1f2937;
+  color: #d1d5db;
+  border: 1px solid #374151;
+  border-radius: var(--radius);
+  padding: 3px 9px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.log-panel__copy-btn:hover {
+  background: #374151;
+  color: #ffffff;
+}
+
+.log-panel__terminal {
+  padding: 16px;
+  background: #0f172a;
+  overflow-x: auto;
+}
+
+.log-panel__pre {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.log-panel__pre:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.log-panel__line {
+  display: block;
+}
+
+.log-panel__fail-badge {
+  display: inline-block;
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-right: 8px;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+
+.log-panel__file-path {
+  color: #f1f5f9;
+  font-weight: 600;
+}
+
+.log-panel__line--error {
+  color: #f87171;
+  font-weight: 600;
+}
+
+.log-panel__cross {
+  color: #ef4444;
+  margin-right: 6px;
+  font-weight: 700;
+}
+
+.log-panel__line--expected {
+  color: #4ade80;
+}
+
+.log-panel__line--received {
+  color: #f87171;
+}
+
+.log-panel__line--summary {
+  color: #94a3b8;
+  border-top: 1px solid #1e293b;
+  padding-top: 8px;
+  margin-top: 4px;
+}

@@ -1,0 +1,122 @@
+.test-suite-result {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.test-suite-result__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-subtle);
+  gap: 12px;
+}
+
+.test-suite-result__title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.test-suite-result__icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.test-suite-result__title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+.test-suite-result__body {
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.test-suite-result__command-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  flex-wrap: wrap;
+}
+
+.test-suite-result__cmd-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.test-suite-result__cmd {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.test-suite-result__counts-bar {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.test-suite-result__count-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--color-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+}
+
+.test-suite-result__count-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+  font-weight: 700;
+}
+
+.test-suite-result__count-val {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.test-suite-result__count-item--pass {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.test-suite-result__count-item--pass .test-suite-result__count-val {
+  color: #166534;
+}
+
+.test-suite-result__explanation {
+  font-size: 13px;
+  color: var(--color-secondary);
+  line-height: 1.45;
+}
+
+@media (max-width: 480px) {
+  .test-suite-result__counts-bar {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,124 @@
+.investigation-synthesis {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-accent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.investigation-synthesis__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-subtle);
+}
+
+.investigation-synthesis__title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.investigation-synthesis__icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.investigation-synthesis__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+.investigation-synthesis__body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.investigation-synthesis__summary {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.investigation-synthesis__signals-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.investigation-synthesis__signals-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+.investigation-synthesis__signals-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.investigation-synthesis__signal-card {
+  background: var(--color-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.investigation-synthesis__signal-dimension {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-accent);
+}
+
+.investigation-synthesis__signal-text {
+  font-size: 13px;
+  color: var(--color-secondary);
+  line-height: 1.45;
+}
+
+.investigation-synthesis__disclaimer {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: #fff8eb;
+  border: 1px solid #fedf89;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #92400e;
+  line-height: 1.5;
+}
+
+.investigation-synthesis__disclaimer-tag {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+}
+
+@media (max-width: 800px) {
+  .investigation-synthesis__signals-grid {
+    grid-template-columns: 1fr;
+  }
+}

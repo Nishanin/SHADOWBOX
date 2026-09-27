@@ -1,0 +1,147 @@
+.failure-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* 1. PAGE HEADER */
+.failure-page__header {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 18px;
+}
+
+.failure-page__header-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.failure-page__title-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.failure-page__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.failure-page__subtitle {
+  font-size: 14px;
+  color: var(--color-muted);
+  max-width: 760px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* DIAGNOSTICS GRID */
+.failure-page__diagnostics-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.failure-page__column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* 6. PRIMARY ACTION BAR */
+.failure-page__action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 24px;
+  margin-top: 4px;
+}
+
+.failure-page__action-callout {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.failure-page__action-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.failure-page__action-desc {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+
+.failure-page__cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: var(--color-accent);
+  color: #ffffff !important;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  text-decoration: none !important;
+  transition: background-color 0.15s ease, transform 0.05s ease;
+  box-shadow: 0 1px 3px rgba(23, 105, 170, 0.25);
+}
+
+.failure-page__cta-btn:hover {
+  background: #115293;
+  color: #ffffff !important;
+}
+
+.failure-page__cta-btn:active {
+  transform: translateY(1px);
+}
+
+.failure-page__cta-btn:focus-visible {
+  outline: 3px solid rgba(23, 105, 170, 0.45);
+  outline-offset: 3px;
+}
+
+.failure-page__cta-arrow {
+  font-size: 16px;
+  line-height: 1;
+  transition: transform 0.15s ease;
+}
+
+.failure-page__cta-btn:hover .failure-page__cta-arrow {
+  transform: translateX(3px);
+}
+
+/* RESPONSIVE LAYOUT */
+@media (max-width: 900px) {
+  .failure-page__diagnostics-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .failure-page__action-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .failure-page__cta-btn {
+    width: 100%;
+  }
+}
