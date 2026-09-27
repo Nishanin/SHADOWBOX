@@ -1,0 +1,30 @@
+{
+  "allowedVariants": ["reproduction", "verification"],
+  "sourcePath": "demo-app",
+  "variants": {
+    "reproduction": {
+      "name": "reproduction",
+      "commit": "23fd96e4c992316437b7aada02f12f915112de23",
+      "description": "Pre-fix buggy implementation with local Date getters in invoiceChecker.js",
+      "expected": {
+        "totalTests": 5,
+        "passedTests": 2,
+        "failedTests": 3,
+        "testExitCode": 1,
+        "status": "REPRODUCED"
+      }
+    },
+    "verification": {
+      "name": "verification",
+      "commit": "96b905b36325a2bb055f2eeba8fb0d1460dfc5c7",
+      "description": "Post-fix verified implementation with UTC Date getters in invoiceChecker.js",
+      "expected": {
+        "totalTests": 7,
+        "passedTests": 7,
+        "failedTests": 0,
+        "testExitCode": 0,
+        "status": "VERIFIED"
+      }
+    }
+  }
+}
