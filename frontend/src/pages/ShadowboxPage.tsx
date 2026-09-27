@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { SHADOWBOX_DATA } from '../data/shadowboxData';
-import { runShadowbox } from '../services/shadowboxApi';
+import { runShadowbox, runDynamicShadowbox } from '../services/shadowboxApi';
 import type { ReproductionResult } from '../types/shadowbox';
 import type { WorkflowOutletContext } from '../types/workflow';
 import { StatusBadge } from '../components/StatusBadge';
@@ -26,6 +26,9 @@ export const ShadowboxPage: React.FC = () => {
   const outlet = useOutletContext<WorkflowOutletContext | undefined>();
   const reproductionResult = outlet?.reproductionResult ?? null;
   const setReproductionResult = outlet?.setReproductionResult;
+  const session = outlet?.session ?? null;
+
+  const isUserSession = Boolean(session && !session.isDemo);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,8 +38,13 @@ export const ShadowboxPage: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const res = await runShadowbox('reproduction');
-      setReproductionResult?.(res);
+      if (isUserSession && session) {
+        const res = await runDynamicShadowbox(session.id);
+        setReproductionResult?.(res);
+      } else {
+        const res = await runShadowbox('reproduction');
+        setReproductionResult?.(res);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -44,22 +52,60 @@ export const ShadowboxPage: React.FC = () => {
     }
   };
 
+  const scenarioName = isUserSession && session?.repositoryUrl
+    ? `${session.repositoryUrl} (${session.resolvedCommit ? session.resolvedCommit.slice(0, 8) : session.branch})`
+    : data.scenario;
+
+  const targetCommand = isUserSession
+    ? {
+        command: session?.repositoryMetadata?.testScript || 'npm test',
+        fullInvocation: `docker run --rm --network none --memory 512m --cpus 1.0 -e TZ=UTC -e CI=true shadowbox-user:latest ${session?.repositoryMetadata?.testScript || 'npm test'}`
+      }
+    : data.command;
+
+  const targetEnv = isUserSession
+    ? {
+        label: 'ISOLATED DOCKER CONTAINER',
+        baseImage: 'node:20-alpine (controlled shadowbox runner)',
+        nodeVersion: session?.environment?.nodeVersion || 'v20.x',
+        operatingEnvironment: 'Linux (Alpine) · Offline Sandbox (--network none)',
+        timezone: 'UTC',
+        envVariable: 'TZ=UTC, CI=true, NODE_ENV=test',
+        workingDir: '/app'
+      }
+    : data.environment;
+
   const activeResult: ReproductionResult = reproductionResult
     ? {
         status: reproductionResult.status,
-        label: 'REAL SHADOWBOX CONTAINER EXECUTION',
-        totalTests: reproductionResult.totalTests ?? 5,
-        passedCount: reproductionResult.passedTests ?? 2,
-        failedCount: reproductionResult.failedTests ?? 3,
-        exitCode: reproductionResult.testExitCode ?? 1,
+        label: isUserSession ? 'DYNAMIC SHADOWBOX CONTAINER EXECUTION' : 'REAL SHADOWBOX CONTAINER EXECUTION',
+        totalTests: reproductionResult.totalTests ?? (isUserSession ? 0 : 5),
+        passedCount: reproductionResult.passedTests ?? (isUserSession ? 0 : 2),
+        failedCount: reproductionResult.failedTests ?? (isUserSession ? 0 : 3),
+        exitCode: reproductionResult.testExitCode ?? 0,
         duration: reproductionResult.duration,
-        imageTag: reproductionResult.imageTag,
+        imageTag: reproductionResult.imageTag || (isUserSession ? 'shadowbox-user:latest' : undefined),
       }
-    : data.result;
+    : (isUserSession
+        ? {
+            status: 'PENDING',
+            label: 'SHADOWBOX ISOLATION PENDING',
+            totalTests: 0,
+            passedCount: 0,
+            failedCount: 0,
+            exitCode: 0,
+            duration: '0s',
+            imageTag: 'shadowbox-user:latest'
+          }
+        : data.result);
 
   const activeLogs: string[] = reproductionResult?.stdout
     ? reproductionResult.stdout.split('\n')
-    : data.logLines;
+    : reproductionResult?.stderr
+    ? reproductionResult.stderr.split('\n')
+    : (isUserSession
+        ? ['[SHADOWBOX] Isolated container execution pending.', '[SHADOWBOX] Click "Run Shadowbox Reproduction" to build and execute with --network none.']
+        : data.logLines);
 
   return (
     <div className="shadowbox-page">
@@ -73,7 +119,7 @@ export const ShadowboxPage: React.FC = () => {
 
           <div className="shadowbox-page__target-badge" aria-label="Scenario target">
             <span className="shadowbox-page__target-label">Scenario:</span>
-            <code className="shadowbox-page__target-name">{data.scenario}</code>
+            <code className="shadowbox-page__target-name">{scenarioName}</code>
           </div>
         </div>
 
@@ -81,10 +127,10 @@ export const ShadowboxPage: React.FC = () => {
       </header>
 
       {/* 2. REPRODUCTION ENVIRONMENT */}
-      <ReproductionEnvironment env={data.environment} />
+      <ReproductionEnvironment env={targetEnv} />
 
       {/* 3. REPRODUCTION COMMAND */}
-      <CommandPanel command={data.command} onRun={handleRun} isLoading={isLoading} />
+      <CommandPanel command={targetCommand} onRun={handleRun} isLoading={isLoading} />
 
       {/* ERROR BANNER IF ANY */}
       {error && (

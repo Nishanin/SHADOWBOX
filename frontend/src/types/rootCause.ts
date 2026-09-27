@@ -45,6 +45,7 @@ export interface RootCauseData {
     highlightedTokens: string[];
   };
   evidenceStreams: EvidenceStreamItem[];
+  missingEvidence?: string[];
   mechanismTrace: {
     timestamp: string;
     steps: MechanismStep[];

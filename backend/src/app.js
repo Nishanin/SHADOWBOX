@@ -3,6 +3,7 @@ const cors = require('cors');
 const config = require('./config');
 const healthRoutes = require('./routes/health.routes');
 const shadowboxRoutes = require('./routes/shadowbox.routes');
+const investigationRoutes = require('./routes/investigation.routes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(express.json());
 // Routes
 app.use('/api', healthRoutes);
 app.use('/api/shadowbox', shadowboxRoutes);
+app.use('/api/investigations', investigationRoutes);
 
 // 404 Handler
 app.use((req, res) => {

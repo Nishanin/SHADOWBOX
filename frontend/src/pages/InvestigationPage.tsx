@@ -1,6 +1,8 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useOutletContext } from 'react-router-dom';
+import type { WorkflowOutletContext } from '../types/workflow';
 import { INVESTIGATION_DATA } from '../data/investigationData';
+import { analyzeInvestigation } from '../services/shadowboxApi';
 import { StatusBadge } from '../components/StatusBadge';
 import { InvestigationCard } from '../components/InvestigationCard';
 import { InvestigationSynthesis } from '../components/InvestigationSynthesis';
@@ -14,7 +16,44 @@ import './InvestigationPage.css';
  * Concludes with a preliminary synthesis and a primary CTA to `/root-cause`.
  */
 export const InvestigationPage: React.FC = () => {
-  const data = INVESTIGATION_DATA;
+  const { session, setSession } = useOutletContext<WorkflowOutletContext>();
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const data = session?.isDemo ? INVESTIGATION_DATA : session?.investigationData;
+
+  const handleAnalyze = async () => {
+    if (!session || isAnalyzing) return;
+    setIsAnalyzing(true);
+    setAnalysisError(null);
+    try {
+      setSession(await analyzeInvestigation(session.id));
+    } catch (error: unknown) {
+      setAnalysisError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  if (!data) {
+    return (
+      <div className="investigation-page">
+        <header className="investigation-page__header">
+          <h1 className="investigation-page__title">Investigation</h1>
+          <p className="investigation-page__subtitle">
+            Static repository analysis is ready to inspect environment, code, and CI evidence.
+          </p>
+          {analysisError && <p role="alert">{analysisError}</p>}
+          <button type="button" onClick={handleAnalyze} disabled={isAnalyzing || !session}>
+            {isAnalyzing ? 'Analyzing...' : 'Start Investigation'}
+          </button>
+        </header>
+      </div>
+    );
+  }
+
+  const targetFailure = session?.repositoryUrl
+    ? `${session.repositoryUrl} (${session.resolvedCommit ? session.resolvedCommit.slice(0, 8) : session.branch})`
+    : data.failureTarget;
 
   return (
     <div className="investigation-page">
@@ -23,16 +62,46 @@ export const InvestigationPage: React.FC = () => {
         <div className="investigation-page__header-top">
           <div className="investigation-page__title-group">
             <h1 className="investigation-page__title">{data.pageTitle}</h1>
-            <StatusBadge status={data.overallStatus} variant="investigating" size="md" />
+            <StatusBadge
+              status={session ? session.status : data.overallStatus}
+              variant={session?.status === 'INITIALIZED' ? 'pass' : 'investigating'}
+              size="md"
+            />
           </div>
 
           <div className="investigation-page__target-badge" aria-label="Investigation target">
             <span className="investigation-page__target-label">Target Failure:</span>
-            <code className="investigation-page__target-name">{data.failureTarget}</code>
+            <code className="investigation-page__target-name">{targetFailure}</code>
           </div>
         </div>
 
         <p className="investigation-page__subtitle">{data.pageSubtitle}</p>
+
+        {session && !session.isDemo && (
+          <div
+            style={{
+              background: '#f8fafc',
+              border: '1px solid #e2e8f0',
+              borderRadius: '6px',
+              padding: '10px 14px',
+              fontSize: '13px',
+              color: '#334155',
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '12px',
+              alignItems: 'center',
+            }}
+          >
+            <span><strong>Session ID:</strong> <code>{session.id}</code></span>
+            <span><strong>Branch:</strong> <code>{session.branch}</code></span>
+            {session.resolvedCommit && (
+              <span><strong>Commit SHA:</strong> <code>{session.resolvedCommit}</code></span>
+            )}
+            <span>
+              <strong>Status:</strong> {session.status} (Ingested successfully. Dynamic analysis pending Bob's workflow.)
+            </span>
+          </div>
+        )}
 
         <div className="investigation-page__parallel-notice">
           <span className="investigation-page__parallel-indicator" aria-hidden="true">

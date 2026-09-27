@@ -11,7 +11,7 @@ export const FindingPanel: React.FC<FindingPanelProps> = ({ finding }) => {
   return (
     <div className="finding-panel">
       <div className="finding-panel__header">
-        <span className="finding-panel__eyebrow">Finding</span>
+        <span className="finding-panel__eyebrow">{finding.type?.replaceAll('_', ' ') || 'Finding'}</span>
         <div className="finding-panel__impact-wrap">
           <span className="finding-panel__impact-label">Impact:</span>
           <StatusBadge status={finding.impact} size="sm" />

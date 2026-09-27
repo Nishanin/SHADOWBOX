@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
+import type { WorkflowOutletContext } from '../types/workflow';
 import { ROOT_CAUSE_DATA } from '../data/rootCauseData';
 import { StatusBadge } from '../components/StatusBadge';
 import { RootCauseDiagnosis } from '../components/RootCauseDiagnosis';
@@ -16,7 +18,22 @@ import './RootCausePage.css';
  * the failure in Shadowbox.
  */
 export const RootCausePage: React.FC = () => {
-  const data = ROOT_CAUSE_DATA;
+  const { session } = useOutletContext<WorkflowOutletContext>();
+  const data = session?.isDemo ? ROOT_CAUSE_DATA : session?.rootCauseData;
+
+  if (!data) {
+    return (
+      <div className="root-cause-page">
+        <header className="root-cause-page__header">
+          <h1 className="root-cause-page__title">Root Cause</h1>
+          <p className="root-cause-page__subtitle">
+            Complete the static investigation before reviewing a synthesized diagnosis.
+          </p>
+          <Link to="/investigation">Back to Investigation</Link>
+        </header>
+      </div>
+    );
+  }
 
   return (
     <div className="root-cause-page">
@@ -51,6 +68,17 @@ export const RootCausePage: React.FC = () => {
 
       {/* 3. THREE-STREAM EVIDENCE MATRIX */}
       <EvidenceMatrix streams={data.evidenceStreams} />
+
+      {data.missingEvidence && data.missingEvidence.length > 0 && (
+        <section aria-label="Missing synthesis evidence">
+          <h2>Missing Evidence</h2>
+          <ul>
+            {data.missingEvidence.map((item, index) => (
+              <li key={index}>{item}</li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* 4. CODE INSPECTION & MECHANISM TRACE */}
       <div className="root-cause-page__deep-dive-grid">
