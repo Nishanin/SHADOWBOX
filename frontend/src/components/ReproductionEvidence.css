@@ -1,0 +1,120 @@
+.repro-evidence {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.repro-evidence__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-subtle);
+  gap: 12px;
+}
+
+.repro-evidence__title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.repro-evidence__icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.repro-evidence__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: 0.01em;
+}
+
+.repro-evidence__badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #175cd3;
+  background: #eff8ff;
+  border: 1px solid #b2ddff;
+  padding: 2px 8px;
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+
+.repro-evidence__body {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.repro-evidence__list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.repro-evidence__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--color-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+}
+
+.repro-evidence__step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.repro-evidence__point-text {
+  font-size: 13px;
+  color: var(--color-text);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.repro-evidence__conclusion-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: #ecfdf3;
+  border: 1px solid #a6f4c5;
+  border-radius: var(--radius);
+  padding: 12px 16px;
+}
+
+.repro-evidence__conclusion-icon {
+  font-size: 16px;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+
+.repro-evidence__conclusion-text {
+  font-size: 13px;
+  color: #027a48;
+  font-weight: 600;
+  line-height: 1.5;
+  margin: 0;
+}

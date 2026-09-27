@@ -1,0 +1,80 @@
+{
+  "agent": "synthesis",
+  "runAt": "2024-01-15T00:00:00Z",
+  "status": "COMPLETE",
+
+  "evidenceMatrix": [
+    {
+      "candidate": "RC-01",
+      "hypothesis": "Local-timezone Date methods applied to a UTC ISO timestamp produce a different calendar date when the runtime timezone differs from the developer's timezone",
+      "environmentEvidence": [
+        { "ref": "ENV-01", "summary": "Developer TZ = Asia/Calcutta (UTC+5:30) - system default" },
+        { "ref": "ENV-02", "summary": "SHADOWBOX TZ = UTC - explicitly set in Dockerfile" },
+        { "ref": "ENV-03", "summary": "2024-01-14T23:30:00Z resolves to Jan 15 in IST, Jan 14 in UTC" },
+        { "ref": "ENV-05", "summary": "TZ is the sole differentiating factor between local and SHADOWBOX" }
+      ],
+      "codeEvidence": [
+        { "ref": "CODE-01", "summary": "isDueToday() uses d.getFullYear(), d.getMonth(), d.getDate() - all local-TZ" },
+        { "ref": "CODE-02", "summary": "Input declared as UTC ISO string; output derived in local timezone - contract mismatch" },
+        { "ref": "CODE-05", "summary": "Exactly 3 TZ-sensitive tests fail; 2 TZ-independent tests pass - matches 2/3 split" },
+        { "ref": "CODE-E4", "summary": "Runtime verified: IST getDate()=15, UTC getDate()=14 for edge timestamp" }
+      ],
+      "ciEvidence": [
+        { "ref": "CI-02", "summary": "SHADOWBOX Docker = UTC = standard CI default - failure confirmed by proxy" },
+        { "ref": "CI-03", "summary": "Any UTC Linux CI runner would produce identical 3-failure result" },
+        { "ref": "CI-04", "summary": "test:utc script confirms developer awareness that CI runs in UTC" }
+      ],
+      "reproductionEvidence": [
+        { "summary": "Local: 5/5 pass (TZ=Asia/Calcutta, no TZ env var)" },
+        { "summary": "npm run test:utc: 2/5 pass, 3/5 fail (TZ=UTC, same code)" },
+        { "summary": "SHADOWBOX Docker: 5 total, 2 pass, 3 fail, exit code 1 - FAILURE REPRODUCED" }
+      ],
+      "contradictingEvidence": [],
+      "confidence": "HIGH",
+      "confidenceRationale": "The mechanism is directly observable at runtime. The exact same code produces different outputs when TZ changes. All three investigator streams converge on the same finding with no contradicting evidence."
+    }
+  ],
+
+  "rootCauseCandidate": {
+    "id": "RC-01",
+    "title": "Timezone-implicit calendar date extraction from a UTC timestamp",
+    "summary": "isDueToday() in demo-app/src/invoiceChecker.js constructs a local calendar date string from a UTC ISO timestamp using JavaScript's local-timezone Date methods (getFullYear, getMonth, getDate). When the server timezone (UTC) differs from the developer's timezone (IST, UTC+5:30), the derived calendar date for timestamps near midnight differs by one day, causing three tests to fail.",
+    "mechanismStepByStep": [
+      "1. Test passes timestamp '2024-01-14T23:30:00.000Z' and target date '2024-01-15' to isDueToday()",
+      "2. new Date('2024-01-14T23:30:00.000Z') creates a Date object representing a fixed instant in time",
+      "3. d.getFullYear(), d.getMonth(), d.getDate() are called - these return LOCAL timezone components",
+      "4. In IST (UTC+5:30): the instant is 2024-01-15 05:00 IST => getDate() returns 15 => localDateStr = '2024-01-15' => matches targetDate => true",
+      "5. In UTC: the instant is 2024-01-14 23:30 UTC => getDate() returns 14 => localDateStr = '2024-01-14' => does not match '2024-01-15' => false",
+      "6. The test asserts === true, so it fails in UTC",
+      "7. getInvoicesDueOn() calls isDueToday() per invoice, so INV-001 is excluded in UTC, reducing the set from [INV-001, INV-002] to [INV-002] and the total from 1250 to 750"
+    ],
+    "affectedFiles": [
+      {
+        "file": "demo-app/src/invoiceChecker.js",
+        "function": "isDueToday",
+        "lines": "33-35",
+        "buggyAPIs": ["d.getFullYear()", "d.getMonth()", "d.getDate()"]
+      }
+    ],
+    "exactEnvironmentDifference": {
+      "local": "TZ=Asia/Calcutta (UTC+5:30) => new Date('2024-01-14T23:30:00Z').getDate() === 15",
+      "shadowbox": "TZ=UTC (UTC+0) => new Date('2024-01-14T23:30:00Z').getDate() === 14"
+    },
+    "whyFailureOccurs": "The local-timezone Date methods project a fixed UTC instant onto a local wall-clock calendar. When the UTC timestamp falls between 18:30 UTC and 23:59 UTC (the 5h30m window before IST midnight), IST returns the next calendar day while UTC returns the current calendar day. The test was written assuming IST semantics.",
+    "missingEvidenceToConfirm": [
+      "Actual CI platform configuration (GitHub Actions workflow) to confirm CI also runs UTC - currently inferred from SHADOWBOX Docker proxy",
+      "Test run on a UTC+0 non-Docker environment (e.g. bare Linux server with TZ=UTC) to confirm the Docker layer itself is not a confounding factor - low probability but untested"
+    ],
+    "fix": {
+      "status": "NOT_APPLIED - Phase 3 is investigation only",
+      "description": "Replace d.getFullYear()/getMonth()/getDate() with d.getUTCFullYear()/getUTCMonth()/getUTCDate() in isDueToday(). This makes date extraction timezone-independent and consistent with the UTC ISO input contract.",
+      "affectedLines": "33-35 of demo-app/src/invoiceChecker.js",
+      "changeCount": "3 one-word substitutions"
+    }
+  },
+
+  "confidenceLevel": "HIGH",
+  "confidenceJustification": "All three independent investigators (Environment, Code, CI) identify the same root cause through different evidence paths. The failure is deterministically reproducible by changing a single environment variable. Runtime verification confirms the exact numeric difference (getDate()=15 vs 14). No contradicting evidence exists.",
+
+  "recommendedNextStep": "Phase 4: Apply the fix (3 getDate->getUTCDate substitutions), run regression tests in both local and SHADOWBOX environments, confirm 5/5 pass in both, and commit the fix with the evidence trail."
+}

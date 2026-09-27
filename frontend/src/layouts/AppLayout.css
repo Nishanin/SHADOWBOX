@@ -1,0 +1,244 @@
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.app-header {
+  background: #17212b;
+  color: #ffffff;
+  flex-shrink: 0;
+}
+
+.app-header__inner {
+  width: min(100% - 48px, 1240px);
+  min-height: 60px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.app-header__identity,
+.app-header__status {
+  display: flex;
+  align-items: center;
+}
+
+.app-header__identity {
+  min-width: 0;
+  gap: 11px;
+}
+
+.app-header__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  border: 1px solid #91a1b2;
+  border-radius: 3px;
+  color: #dce8f2;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.app-header__brand {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.app-header__divider {
+  width: 1px;
+  height: 18px;
+  background: #536171;
+}
+
+.app-header__tagline {
+  overflow: hidden;
+  color: #b8c3ce;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-header__status {
+  flex-shrink: 0;
+  gap: 7px;
+  color: #b8c3ce;
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.app-header__status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #6fc28b;
+}
+
+.workflow-nav {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.workflow-nav__inner {
+  width: min(100% - 48px, 1240px);
+  margin: 0 auto;
+  padding: 18px 0 20px;
+}
+
+.workflow-nav__eyebrow {
+  margin-bottom: 11px;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.workflow-nav__list {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  list-style: none;
+}
+
+.workflow-nav__item {
+  min-width: 0;
+}
+
+.workflow-nav__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 58px;
+  gap: 10px;
+  padding: 9px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-muted);
+  background: var(--color-surface);
+  text-decoration: none;
+}
+
+.workflow-nav__link:hover {
+  border-color: #9eabb8;
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.workflow-nav__item.current .workflow-nav__link {
+  border-color: var(--color-accent);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+  color: var(--color-text);
+}
+
+.workflow-nav__item.complete .workflow-nav__link {
+  background: #f7faf8;
+  color: var(--color-text);
+}
+
+.workflow-nav__step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border: 1px solid #b5c0ca;
+  border-radius: 50%;
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.workflow-nav__item.current .workflow-nav__step-num {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #ffffff;
+}
+
+.workflow-nav__item.complete .workflow-nav__step-num {
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.workflow-nav__step-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.workflow-nav__step-label {
+  overflow: hidden;
+  font-size: 13px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-nav__step-state {
+  color: var(--color-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.workflow-nav__item.current .workflow-nav__step-state {
+  color: var(--color-accent);
+}
+
+.workflow-nav__item.complete .workflow-nav__step-state {
+  color: var(--color-success);
+}
+
+.app-main {
+  width: min(100% - 48px, 1200px);
+  flex: 1;
+  margin: 0 auto;
+  padding: 36px 0 56px;
+}
+
+@media (max-width: 760px) {
+  .app-header__inner,
+  .workflow-nav__inner,
+  .app-main {
+    width: min(100% - 32px, 1200px);
+  }
+
+  .app-header__inner {
+    min-height: 56px;
+  }
+
+  .app-header__tagline,
+  .app-header__status {
+    display: none;
+  }
+
+  .workflow-nav__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workflow-nav__item:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 420px) {
+  .workflow-nav__list {
+    grid-template-columns: 1fr;
+  }
+
+  .workflow-nav__item:last-child {
+    grid-column: auto;
+  }
+}

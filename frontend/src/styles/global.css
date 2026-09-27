@@ -1,0 +1,62 @@
+/* SHADOWBOX — global styles */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg:        #f4f6f8;
+  --color-surface:   #ffffff;
+  --color-subtle:    #eef1f4;
+  --color-border:    #d9dee5;
+  --color-text:      #17212b;
+  --color-muted:     #5f6b76;
+  --color-accent:    #1769aa;
+  --color-secondary: #52606d;
+  --color-success:   #247a4b;
+  --color-danger:    #b42318;
+
+  --font-sans: -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Fira Mono", monospace;
+
+  --radius: 4px;
+  --shadow: 0 1px 2px rgba(23, 33, 43, 0.06);
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+button, a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 3px solid rgba(23, 105, 170, 0.35);
+  outline-offset: 2px;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 600;
+  line-height: 1.3;
+}

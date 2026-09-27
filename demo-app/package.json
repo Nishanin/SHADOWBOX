@@ -1,0 +1,13 @@
+{
+  "name": "shadowbox-demo-app",
+  "version": "1.0.0",
+  "description": "Demo application with a deterministic environment-dependent bug for SHADOWBOX investigation.",
+  "main": "src/invoiceChecker.js",
+  "scripts": {
+    "test": "node --test tests/invoiceChecker.test.js",
+    "test:utc": "cross-env TZ=UTC node --test tests/invoiceChecker.test.js"
+  },
+  "devDependencies": {
+    "cross-env": "7.0.3"
+  }
+}
